@@ -2,7 +2,7 @@
 Inserting the randomly generated integers into a BST generally gives a height in the order of:
 
 Your answer:
-
+O(log n)
 
 */
 
@@ -11,6 +11,7 @@ Your answer:
 #include <chrono>
 #include <cmath>
 #include <random>
+#include <stdlib.h>
 #include "BST.h"
 
 double log2(double d)
