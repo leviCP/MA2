@@ -27,7 +27,7 @@ public:
 	void insert(const Comparable & x);
 	void remove(const Comparable & x);
 	int treeSize() const;
-	int treeHeight() const;
+	int treeHeight();
 	void printInOrder() const;
 	void printLevels() const;
 	void printMaxPath() const;
@@ -49,11 +49,11 @@ private:
 	BinaryNode * findMin( BinaryNode * t ) const;
 	BinaryNode * findMax( BinaryNode * t ) const;
 	void makeEmpty( BinaryNode * & t );
-	bool contains(const Comparable & x, BinaryNode &t) const;
-	void insert(const Comparable & x, BinaryNode &curNode);
-	void remove(const Comparable & x, BinaryNode * & rem_node);
+	bool contains_h(const Comparable & x, BinaryNode &t) const;
+	void insert_h(const Comparable & x, BinaryNode &curNode);
+	void remove_h(const Comparable & x, BinaryNode * & rem_node);
 	int size_helper(BinaryNode * curNode);
-
+	int height_help(BinaryNode * cur);
 	void prt_io_help(BinaryNode* curNode); //io means in order
 	
 };
@@ -65,7 +65,9 @@ private:
 
 // constructor
 template<typename Comparable>
-BST<Comparable>::BST() ;
+BST<Comparable>::BST() {
+	this->root = nullptr;
+};
 
 // destructor, refer to textbook, Figure 4.27
 template<typename Comparable>
@@ -135,27 +137,33 @@ typename BST<Comparable>::BinaryNode* BST<Comparable>::findMax(BinaryNode * t) c
 
 // public contains: refer to textbook, Figure 4.17, Line 4 - 7
 template<typename Comparable>
-bool BST<Comparable>::contains( const Comparable & x ) const {
+bool BST<Comparable>::contains( const Comparable & x ) const 
+{
 	
-	return contains(x, this->root);
+	return contains_h(x, this->root);
 }
 
 //definition of private function
 /**/
 template <typename Comparable>
-inline bool BST<Comparable>::contains(const Comparable &x, BinaryNode &t) const
+inline bool BST<Comparable>::contains_h(const Comparable &x, BinaryNode &t) const
 {
+
+	if(t->element == x)
+	{
+		return true;
+	}
     if(t == nullptr)//no element x in the list
 	{
 		return false;
 	}
 	else if(x < t->element) //go left
 	{
-		contains(x, t->left);
+		contains_h(x, t->left);
 	}
 	else if(x > t->element) //go right
 	{
-		contains(x, t->right);
+		contains_h(x, t->right);
 	}
 }
 
@@ -164,12 +172,12 @@ inline bool BST<Comparable>::contains(const Comparable &x, BinaryNode &t) const
 template<typename Comparable>
 void BST<Comparable>::insert(const Comparable & x) {
 	//cout << "**TODO**: insert function" << endl;
-	insert(x, this->root);
+	insert_h(x, root);
 
 }
 
 template <typename Comparable>
-inline void BST<Comparable>::insert(const Comparable &x, BinaryNode &curNode)
+inline void BST<Comparable>::insert_h(const Comparable &x, BinaryNode &curNode)
 {
 	if(curNode == nullptr)//hit place to insert
 	{
@@ -177,11 +185,11 @@ inline void BST<Comparable>::insert(const Comparable &x, BinaryNode &curNode)
 	}
 	else if(x < curNode->element)
 	{
-		insert(x, curNode->left);
+		insert_h(x, curNode->left);
 	}
 	else if(x < curNode->element)
 	{
-		insert(x, curNode->right);
+		insert_h(x, curNode->right);
 	}
 }
 
@@ -190,11 +198,11 @@ inline void BST<Comparable>::insert(const Comparable &x, BinaryNode &curNode)
 // public remove: refer to textbook, Figure 4.17, Line 20 - 23
 template<typename Comparable>
 void BST<Comparable>::remove( const Comparable & x ) {
-	remove(x, this->root);
+	remove_h(x, this->root);
 }
 
 template <typename Comparable>
-inline void BST<Comparable>::remove(const Comparable &x, BinaryNode *&remNode)
+inline void BST<Comparable>::remove_h(const Comparable &x, BinaryNode *&remNode)
 {
 	if( remNode == nullptr)
 	{
@@ -202,21 +210,21 @@ inline void BST<Comparable>::remove(const Comparable &x, BinaryNode *&remNode)
 	}
 	if(x < remNode->element)
 	{
-		remove(x, remNode);
+		remove_h(x, remNode);
 	}
 	else if(x > remNode->element)
 	{
-		remove(x, remNode);
+		remove_h(x, remNode);
 	}
 	else if(remNode->left != nullptr && remNode != nullptr)
 	{
 		remNode->element = findMin(remNode->right)->element;
-		remove(remNode->element, remNode->right);
+		remove_h(remNode->element, remNode->right);
 	}
 	else
 	{
 		BinaryNode *oldNode = remNode;
-		remNode = ( remNode->left != nullptr ) ? remNode->left :: remNode->right;
+		remNode = ( remNode->left != nullptr ) ? remNode->left : remNode->right;
 		delete oldNode;
 	}
 }
@@ -227,7 +235,7 @@ template <typename Comparable>
 int BST<Comparable>::treeSize() const {
 	//cout << "**TODO**: treeSize function" << endl;
 	int size = 0;
-	return size = size_helper(this->root);
+	return size = size_helper(root);
 	
 }
 
@@ -247,15 +255,30 @@ inline int BST<Comparable>::size_helper(BinaryNode *curNode)
 
 // public treeHeight
 template <typename Comparable>
-int BST<Comparable>::treeHeight() const {
-	cout << "**TODO**: treeHeight function" << endl;
-	return 0;
+int BST<Comparable>::treeHeight(){
+
+	return height_help(root);
+	
+}
+
+template <typename Comparable>
+inline int BST<Comparable>::height_help(BinaryNode *cur)
+{
+   if(cur == nullptr)
+	{
+		return 0;
+	}
+
+	int left = height_help(cur->left);
+	int right = height_help(cur->right);
+
+	return 1 + max(left, right);
 }
 
 // public printInOrder: refer to textbook, Figure 4.60
 template<typename Comparable>
 void BST<Comparable>::printInOrder() const {
-	prt_io_help(this->root);
+	prt_io_help(root);
 }
 
 template <typename Comparable>
